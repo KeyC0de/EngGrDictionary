@@ -1,11 +1,8 @@
 #pragma once
 
-#include <iostream>
 #include <fstream>
-#include <algorithm>
 #include <string>
 #include <map>
-#include <iomanip>
 #include <boost/serialization/map.hpp>
 #include <boost/serialization/access.hpp>
 #include <boost/archive/text_wiarchive.hpp>
@@ -20,7 +17,7 @@
 namespace
 {
 
-static inline bool fileExists( const std::wstring fname )
+static inline bool fileExists( const std::wstring& fname )
 {
 	std::wifstream inf( fname );
 	return inf.good();
@@ -36,118 +33,102 @@ static inline bool fileExists( const std::wstring fname )
 //	\date	2018/11/04 23:18
 //
 //	\brief	Dictionary English <-> Greek
+//			data structure: map{ s{wordLanguage1},
+//								pair{ s{translation}, s{wordOtherLanguage} }
+//							}
 //=============================================================
 class EngGrDictionary final
 {
 	friend class boost::serialization::access;
 private:
 	static inline const std::wstring fileName = L"EngGrDictionary";
-	unsigned int cengWords;
-	unsigned int cgrWords;
-	unsigned int centries;
-
+	unsigned int m_nEnglishWords;
+	unsigned int m_nGreekWords;
+	unsigned int m_nEntries;
+	std::map<std::wstring, std::pair<std::wstring, std::wstring>> m_englishWords;
+	std::map<std::wstring, std::pair<std::wstring, std::wstring>> m_greekWords;
+	
+	//===================================================
+	//	\function	serialize
+	//	\brief  lists all the fields to be serialized/deserialized
+	//	\date	2018/11/04 23:49
 	template<class Archive>
 	void serialize( Archive& ar,
 		const unsigned int version )
 	{
-		// list all the fields to be serialized/deserialized.
-		ar& cengWords;
-		ar& cgrWords;
-		ar& centries;
-		ar& engWords;
-		ar& grWords;
+		ar& m_nEnglishWords;
+		ar& m_nGreekWords;
+		ar& m_nEntries;
+		ar& m_englishWords;
+		ar& m_greekWords;
 	}
 
-	EngGrDictionary() :
-		cengWords(0), cgrWords(0), centries(0)
-	{}
+	//===================================================
+	//	\function	EngGrDictionary
+	//	\brief  private constructor
+	//			this is a Singleton class
+	//	\date	2018/11/04 23:48
+	EngGrDictionary();
 public:
-	std::map<std::wstring, std::pair<std::wstring, std::wstring>> engWords;
-	std::map<std::wstring, std::pair<std::wstring, std::wstring>> grWords;
-
 	EngGrDictionary( const EngGrDictionary& rhs ) = delete;
 	EngGrDictionary& operator=( const EngGrDictionary& rhs ) = delete;
 	~EngGrDictionary() = default;
 
-	static inline EngGrDictionary* getInstance()
-	{
-		static EngGrDictionary* instance;	// have a pointer to the only dictionary
-		if ( ::fileExists( fileName ) )
-		{	// load dictionary from file
-			std::wifstream file( fileName );
-			if (file.is_open())
-			{
-				wchar_t c1;
-				file >> c1;
-				wchar_t c2;
-				file >> c2;
-				wchar_t c3;
-				file >> c3;
-				//if (c1 == L'0xFF' && c2 == L'0xFE')							// UTF-16
-				//if (std::wcscmp(&c1, L"0xFF") == 0 && std::wcscmp(&c2, L"0xFE") == 0) {
-				//	file.imbue(std::locale(file.getloc(), new std::codecvt_utf16<wchar_t>));
-				//}
-				//else { // (c1 == L'0xEF' && c2 == L'0xBB' && c3 == L'0xBF')	// UTF-8
-				//	file.imbue(std::locale(file.getloc(), new std::codecvt_utf8<wchar_t>));
-				//}
-				file.seekg(std::ios::beg);
-
-				boost::archive::text_wiarchive ia(file);
-				//boost::archive::binary_wiarchive ia(file);
-				instance = new EngGrDictionary();
-				ia >> instance;
-				file.close();
-				return instance;
-			}
-		}
-		return instance;
-	}
-
-	void addEngWord(std::wstring engWord, std::wstring meaning, std::wstring grWord);
-	void addGrWord(std::wstring grWord, std::wstring meaning, std::wstring engWord);
-	void findEngWord();
-	void findGrWord();
+	//===================================================
+	//	\function	getInstance
+	//	\brief  creates and returns the class instance
+	//			loads dictionary from file if this is the first time we call it
+	//	\date	2018/11/04 23:51
+	static EngGrDictionary& getInstance();
+	void addEnglishWord( const std::wstring& engWord,
+		const std::wstring& meaning,
+		const std::wstring& grWord );
+	void addGreekWord( const std::wstring& grWord,
+		const std::wstring& meaning,
+		const std::wstring& engWord );
+	void findEnglishWord();
+	void findGreekWord();
 	void translateEngToGr();
 	void translateGrToEng();
-	void displayEngWords();
-	void displayGrWords();
+	void displayEnglishWords();
+	void displayGreekWords();
 	std::wstring input();
 	void mainMenu();
 	bool backToMainMenu() const;
-	void about();
-	
-	unsigned getCount() const {
-		return this->centries;
+	void aboutMenu();
+
+	unsigned getCount() const noexcept
+	{
+		return this->m_nEntries;
 	}
 
-	unsigned getEngWordCount() const {
-		return cengWords;
+	unsigned getEnglishWordCount() const noexcept
+	{
+		return m_nEnglishWords;
 	}
 
-	unsigned getGrWordCount() const {
-		return this->cgrWords;
+	unsigned getGreekWordCount() const noexcept
+	{
+		return this->m_nGreekWords;
 	}
 	
-	void destroy() {
-		engWords.clear();
-		grWords.clear();
-		centries = 0;
-	}
+	void destroy();
 	/*
+	TODO:
 	// write member variables to files
 	friend std::ostream& operator<<(std::ostream& outFile, const EngGrDictionary& obj) {
-		outFile << obj.cengWords << "\n" << obj.cgrWords << "\n" << obj.centries << "\n" <<
-			obj.engWords << "\n" << obj.grWords << "\n";
+		outFile << obj.m_nEnglishWords << "\n" << obj.m_nGreekWords << "\n" << obj.m_nEntries << "\n" <<
+			obj.m_englishWords << "\n" << obj.m_greekWords << "\n";
 		return outFile;
 	}
 
 	// read member variables from files
 	friend std::istream& operator>>(std::istream& file, EngGrDictionary& obj) {
-		file >> obj.cengWords;
-		file >> obj.cgrWords;
-		file >> obj.centries;
-		file >> obj.engWords;
-		file >> obj.grWords;
+		file >> obj.m_nEnglishWords;
+		file >> obj.m_nGreekWords;
+		file >> obj.m_nEntries;
+		file >> obj.m_englishWords;
+		file >> obj.m_greekWords;
 		return file;
 	}*/
 };
