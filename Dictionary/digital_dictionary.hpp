@@ -14,18 +14,6 @@
 //#include <boost/archive/binary_iarchive.hpp>
 //#include <boost/archive/binary_oarchive.hpp>
 
-namespace
-{
-
-static inline bool fileExists( const std::wstring& fname )
-{
-	std::wifstream inf( fname );
-	return inf.good();
-}
-
-};
-
-
 //============================================================
 //	\class	EngGrDictionary
 //
@@ -42,12 +30,15 @@ class EngGrDictionary final
 	friend class boost::serialization::access;
 private:
 	static inline const std::wstring fileName = L"EngGrDictionary";
-	unsigned int m_nEnglishWords;
-	unsigned int m_nGreekWords;
-	unsigned int m_nEntries;
+	static inline bool bInstanceCreated = false;
+private:
+	std::size_t m_nEnglishWords;
+	std::size_t m_nGreekWords;
+	std::size_t m_nEntries;
 	std::map<std::wstring, std::pair<std::wstring, std::wstring>> m_englishWords;
 	std::map<std::wstring, std::pair<std::wstring, std::wstring>> m_greekWords;
 	
+private:
 	//===================================================
 	//	\function	serialize
 	//	\brief  lists all the fields to be serialized/deserialized
@@ -80,34 +71,34 @@ public:
 	//			loads dictionary from file if this is the first time we call it
 	//	\date	2018/11/04 23:51
 	static EngGrDictionary& getInstance();
-	void addEnglishWord( const std::wstring& engWord,
-		const std::wstring& meaning,
-		const std::wstring& grWord );
-	void addGreekWord( const std::wstring& grWord,
-		const std::wstring& meaning,
-		const std::wstring& engWord );
+	void addEnglishWord( std::wstring engWord,
+		std::wstring meaning,
+		std::wstring grWord );
+	void addGreekWord( std::wstring grWord,
+		std::wstring meaning,
+		std::wstring engWord );
 	void findEnglishWord();
 	void findGreekWord();
 	void translateEngToGr();
 	void translateGrToEng();
 	void displayEnglishWords();
 	void displayGreekWords();
-	std::wstring input();
+	std::wstring getUserInput();
 	void mainMenu();
 	bool backToMainMenu() const;
 	void aboutMenu();
 
-	unsigned getCount() const noexcept
+	std::size_t getCount() const noexcept
 	{
 		return this->m_nEntries;
 	}
 
-	unsigned getEnglishWordCount() const noexcept
+	std::size_t getEnglishWordCount() const noexcept
 	{
 		return m_nEnglishWords;
 	}
 
-	unsigned getGreekWordCount() const noexcept
+	std::size_t getGreekWordCount() const noexcept
 	{
 		return this->m_nGreekWords;
 	}

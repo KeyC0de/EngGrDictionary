@@ -1,30 +1,26 @@
-﻿#include <io.h>
+﻿#include <clocale>
+#include <io.h>
 #include <fcntl.h>
 #include "digital_dictionary.hpp"
 #include <iostream>
-
-
-std::wifstream::pos_type filesize( const std::wstring filename )
-{
-	std::wifstream in( filename,
-		std::wifstream::ate | std::ios::binary );
-	std::wcout << in.tellg() << std::endl;
-	return in.tellg();
-}
 
 #define inst EngGrDictionary::getInstance()
 
 
 int main() 
 {
-	std::locale loc{ "en-US.UTF-8" };
-	std::locale::global( loc );
 	fflush( stdout );
 	_setmode( _fileno( stdout ), _O_U16TEXT );
 	_setmode( _fileno( stderr ), _O_U16TEXT );
 	_setmode( _fileno( stdin ), _O_U16TEXT );
-	// use w-streams for interaction with the console & regular streams for interaction with files
 	std::ios_base::sync_with_stdio( false );
+	// use w-streams for interaction with the console & regular streams for interaction with files
+	const char* zsEnglishLocaleName = "en-US.UTF-8";
+	const wchar_t* zwsEnglishLocaleName = L"en-US.UTF-8";
+	std::setlocale( LC_ALL, zsEnglishLocaleName );
+	std::locale englishLocale{ zsEnglishLocaleName };
+	std::locale::global( englishLocale );
+	_wsetlocale( LC_ALL, zwsEnglishLocaleName );
 
 
 	// few entries for demo

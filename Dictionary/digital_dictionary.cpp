@@ -1,47 +1,69 @@
-#include <boost/algorithm/string.hpp>
+﻿#include <boost/algorithm/string.hpp>
 #include <iostream>
 #include <algorithm>
 #include <iomanip>
+#include <codecvt>
 #include "digital_dictionary.hpp"
+
+namespace
+{
+
+static inline bool fileExists( const std::wstring& fname )
+{
+	std::wifstream inf( fname );
+	return inf.good();
+}
+
+};
 
 
 EngGrDictionary::EngGrDictionary()
 	:
-	m_nEnglishWords{0},
-	m_nGreekWords{0},
-	m_nEntries{0}
+	m_nEnglishWords{0u},
+	m_nGreekWords{0u},
+	m_nEntries{0u}
 {}
 
 EngGrDictionary& EngGrDictionary::getInstance()
 {
 	static EngGrDictionary instance;	// have a pointer to the only dictionary
-	if ( ::fileExists( fileName ) )
+	if ( !bInstanceCreated )
 	{
-		std::wifstream file( fileName );
-		if (file.is_open())
+		if ( !::fileExists( fileName ) )
 		{
-			wchar_t c1;
-			file >> c1;
-			wchar_t c2;
-			file >> c2;
-			wchar_t c3;
-			file >> c3;
-			//if (c1 == L'0xFF' && c2 == L'0xFE')							// UTF-16
-			//if (std::wcscmp(&c1, L"0xFF") == 0 && std::wcscmp(&c2, L"0xFE") == 0) {
-			//	file.imbue(std::locale(file.getloc(), new std::codecvt_utf16<wchar_t>));
-			//}
-			//else { // (c1 == L'0xEF' && c2 == L'0xBB' && c3 == L'0xBF')	// UTF-8
-			//	file.imbue(std::locale(file.getloc(), new std::codecvt_utf8<wchar_t>));
-			//}
-			file.seekg( std::ios::beg );
-	
-			boost::archive::text_wiarchive ia( file );
-			//boost::archive::binary_wiarchive ia(file);
-			//instance = new EngGrDictionary();
-			ia >> instance;
-			file.close();
-			return instance;
+			// create the file if it doesn't exist
+			std::wifstream file( fileName );
+			if ( file.is_open() )
+			{
+				wchar_t c1;
+				file >> c1;
+				wchar_t c2;
+				file >> c2;
+				wchar_t c3;
+				file >> c3;
+				////if (c1 == L'0xFF' && c2 == L'0xFE')							// UTF-16
+				//if ( std::wcscmp( &c1, L"0xFF" ) == 0 && std::wcscmp( &c2, L"0xFE" ) == 0 )
+				//{
+				//	file.imbue( std::locale( file.getloc(),
+				//		new std::codecvt_utf16<wchar_t>) );
+				//	std::wcout << L"ucs-2 or utf-16" << L'\n';
+				//}
+				//else
+				//{ // (c1 == L'0xEF' && c2 == L'0xBB' && c3 == L'0xBF')	// UTF-8
+				//	file.imbue( std::locale( file.getloc(),
+				//		new std::codecvt_utf8<wchar_t>) );
+				//	std::wcout << L"utf-8" << L'\n';
+				//}
+				file.seekg( std::ios::beg );
+		
+				boost::archive::text_wiarchive ia( file );
+				//boost::archive::binary_wiarchive ia(file);
+				ia >> instance;
+				file.close();
+				return instance;
+			}
 		}
+		bInstanceCreated = true;
 	}
 	return instance;
 }
@@ -50,16 +72,18 @@ void EngGrDictionary::destroy()
 {
 	m_englishWords.clear();
 	m_greekWords.clear();
-	m_nEntries = 0;
+	m_nEntries = 0u;
+	bInstanceCreated = false;
 }
 
 
-std::wstring EngGrDictionary::input()
+std::wstring EngGrDictionary::getUserInput()
 {
 	std::wstring inWord;
 	std::wcout << L"\n\nWaiting for input.. ";
 	std::getline( std::wcin,
 		inWord );
+	std::wcout << L"inputted: " << inWord << L'\n';
 	std::wcout << std::endl;
 	return inWord;
 }
@@ -67,7 +91,7 @@ std::wstring EngGrDictionary::input()
 void EngGrDictionary::translateEngToGr()
 {
 	std::wcout << L"\n English -> Greek" << std::endl;
-	std::wstring inWord = input();
+	std::wstring inWord = getUserInput();
 	boost::algorithm::to_lower( inWord );
 	if ( m_englishWords.find( inWord ) != m_englishWords.end() )
 	{
@@ -75,11 +99,13 @@ void EngGrDictionary::translateEngToGr()
 			<< std::endl;
 	}
 	else
+	{
 		std::wcout << L"No such word in the dictionary\n";
+	}
 
 	if ( backToMainMenu() )
 	{
-		mainMenu();
+		return;
 	}
 	else
 	{
@@ -91,19 +117,23 @@ void EngGrDictionary::translateGrToEng()
 {
 	std::wcout << L"\n Greek -> English"
 		<< std::endl;
-	std::wstring inWord = input();
+	std::wstring inWord = getUserInput();
+	std::wcout << L"inputted: " << inWord << L'\n';
 	boost::algorithm::to_lower( inWord );
+	std::wcout << L"inputted: " << inWord << L'\n';
 	if ( m_greekWords.find( inWord ) != m_greekWords.end() )
 	{
 		std::wcout << m_greekWords[inWord].second
 			<< std::endl;
 	}
 	else
+	{
 		std::wcout << L"No such word in the dictionary\n";
+	}
 
 	if ( backToMainMenu() )
 	{
-		mainMenu();
+		return;
 	}
 	else
 	{
@@ -113,7 +143,7 @@ void EngGrDictionary::translateGrToEng()
 
 void EngGrDictionary::findEnglishWord()
 {
-	std::wstring inWord = input();
+	std::wstring inWord = getUserInput();
 	boost::algorithm::to_lower( inWord );
 	if ( m_englishWords.find( inWord ) != m_englishWords.end() )
 	{
@@ -127,7 +157,7 @@ void EngGrDictionary::findEnglishWord()
 
 	if ( backToMainMenu() )
 	{
-		mainMenu();
+		return;
 	}
 	else
 	{
@@ -137,8 +167,10 @@ void EngGrDictionary::findEnglishWord()
 
 void EngGrDictionary::findGreekWord()
 {
-	std::wstring inWord = input();
+	std::wstring inWord = getUserInput();
+	std::wcout << L"inputted: " << inWord << L'\n';
 	boost::algorithm::to_lower( inWord );
+	std::wcout << L"inputted: " << inWord << L'\n';
 	if ( m_greekWords.find( inWord ) != m_greekWords.end() )
 	{
 		std::wcout << m_greekWords[inWord].first
@@ -151,7 +183,7 @@ void EngGrDictionary::findGreekWord()
 
 	if ( backToMainMenu() )
 	{
-		mainMenu();
+		return;
 	}
 	else
 	{
@@ -159,9 +191,9 @@ void EngGrDictionary::findGreekWord()
 	}
 }
 
-void EngGrDictionary::addEnglishWord( const std::wstring& engWord,
-	const std::wstring& meaning,
-	const std::wstring& grWord )
+void EngGrDictionary::addEnglishWord( std::wstring engWord,
+	std::wstring meaning,
+	std::wstring grWord )
 {
 	boost::algorithm::to_lower( engWord );
 	if ( m_englishWords.find( engWord ) == m_englishWords.end() )
@@ -176,9 +208,9 @@ void EngGrDictionary::addEnglishWord( const std::wstring& engWord,
 	}
 }
 
-void EngGrDictionary::addGreekWord( const std::wstring& grWord,
-	const std::wstring& meaning,
-	const std::wstring& engWord )
+void EngGrDictionary::addGreekWord( std::wstring grWord,
+	std::wstring meaning,
+	std::wstring engWord )
 {
 	boost::algorithm::to_lower( grWord );
 	if ( m_greekWords.find( grWord ) == m_greekWords.end() )
@@ -233,14 +265,18 @@ bool EngGrDictionary::backToMainMenu() const
 	std::wcin.ignore();
 	std::wcout << std::endl;
 	if ( answer == L'Y'
-		|| answer == L'y' )
+		|| answer == L'y'
+		|| answer == L'ν'
+		|| answer == L'Ν'
+		|| answer == L'Ο'
+		|| answer == L'ο' )
 	{
 		return true;
 	}
 	return false;
 }
 
-void EngGrDictionary::mainMenu() 
+void EngGrDictionary::mainMenu()
 {
 	int option;
 	std::wstring inWord;
@@ -292,22 +328,22 @@ void EngGrDictionary::mainMenu()
 			break;
 		case 5:
 			std::wcout << L"\nEnglish word: ";
-			inWord = input();
+			inWord = getUserInput();
 			std::wcout << L"\nMeaning: ";
-			inMeaning = input();
+			inMeaning = getUserInput();
 			std::wcout << L"\nTranslation: ";
-			inTranslation = input();
+			inTranslation = getUserInput();
 			addEnglishWord( inWord,
 				inMeaning,
 				inTranslation );
 			break;
 		case 6:
 			std::wcout << L"\nGreek word: ";
-			inWord = input();
+			inWord = getUserInput();
 			std::wcout << L"\nMeaning: ";
-			inMeaning = input();
+			inMeaning = getUserInput();
 			std::wcout << L"\nTranslation: ";
-			inTranslation = input();
+			inTranslation = getUserInput();
 			addGreekWord( inWord,
 				inMeaning,
 				inTranslation );
@@ -330,12 +366,13 @@ void EngGrDictionary::mainMenu()
 
 void EngGrDictionary::aboutMenu()
 {
-	std::wcout << L"\nEnglish - Greek dictionary v0.1\n" << L'\n';
+	std::wcout << L"\nEnglish - Greek dictionary v0.1\n\n";
 	std::wcout << L"A Digital dictionary able to translate words between English <->\
 Greek, as well as providing their respective meanings.\n";
+
 	if ( backToMainMenu() )
 	{
-		mainMenu();
+		return;
 	}
 	else
 	{
