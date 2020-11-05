@@ -5,17 +5,6 @@
 #include <codecvt>
 #include "digital_dictionary.hpp"
 
-namespace
-{
-
-static inline bool fileExists( const std::wstring& fname )
-{
-	std::wifstream inf( fname );
-	return inf.good();
-}
-
-};
-
 
 EngGrDictionary::EngGrDictionary()
 	:
@@ -26,42 +15,40 @@ EngGrDictionary::EngGrDictionary()
 
 EngGrDictionary& EngGrDictionary::getInstance()
 {
-	static EngGrDictionary instance;	// have a pointer to the only dictionary
+	static EngGrDictionary instance;
 	if ( !bInstanceCreated )
 	{
-		if ( !::fileExists( fileName ) )
+		// create the file if it doesn't exist
+		std::wfstream file( fileName );
+		if ( file.is_open() )
 		{
-			// create the file if it doesn't exist
-			std::wifstream file( fileName );
-			if ( file.is_open() )
-			{
-				wchar_t c1;
-				file >> c1;
-				wchar_t c2;
-				file >> c2;
-				wchar_t c3;
-				file >> c3;
-				////if (c1 == L'0xFF' && c2 == L'0xFE')							// UTF-16
-				//if ( std::wcscmp( &c1, L"0xFF" ) == 0 && std::wcscmp( &c2, L"0xFE" ) == 0 )
-				//{
-				//	file.imbue( std::locale( file.getloc(),
-				//		new std::codecvt_utf16<wchar_t>) );
-				//	std::wcout << L"ucs-2 or utf-16" << L'\n';
-				//}
-				//else
-				//{ // (c1 == L'0xEF' && c2 == L'0xBB' && c3 == L'0xBF')	// UTF-8
-				//	file.imbue( std::locale( file.getloc(),
-				//		new std::codecvt_utf8<wchar_t>) );
-				//	std::wcout << L"utf-8" << L'\n';
-				//}
-				file.seekg( std::ios::beg );
-		
-				boost::archive::text_wiarchive ia( file );
-				//boost::archive::binary_wiarchive ia(file);
-				ia >> instance;
-				file.close();
-				return instance;
-			}
+			wchar_t c1;
+			file >> c1;
+			wchar_t c2;
+			file >> c2;
+			wchar_t c3;
+			file >> c3;
+			////if (c1 == L'0xFF' && c2 == L'0xFE')						// UTF-16
+			//if ( std::wcscmp( &c1, L"0xFF" ) == 0 && std::wcscmp( &c2, L"0xFE" ) == 0 )
+			//{
+			//	file.imbue( std::locale( file.getloc(),
+			//		new std::codecvt_utf16<wchar_t>) );
+			//	std::wcout << L"ucs-2 or utf-16" << L'\n';
+			//}
+			//else
+			//{ // (c1 == L'0xEF' && c2 == L'0xBB' && c3 == L'0xBF')	// UTF-8
+			//	file.imbue( std::locale( file.getloc(),
+			//		new std::codecvt_utf8<wchar_t>) );
+			//	std::wcout << L"utf-8" << L'\n';
+			//}
+			file.seekg( std::ios::beg );
+	
+			// TODO: exception here:
+			boost::archive::text_wiarchive ia( file );
+			//boost::archive::binary_wiarchive ia(file);
+			ia >> instance;
+			file.close();
+			return instance;
 		}
 		bInstanceCreated = true;
 	}
@@ -83,7 +70,6 @@ std::wstring EngGrDictionary::getUserInput()
 	std::wcout << L"\n\nWaiting for input.. ";
 	std::getline( std::wcin,
 		inWord );
-	std::wcout << L"inputted: " << inWord << L'\n';
 	std::wcout << std::endl;
 	return inWord;
 }
@@ -118,9 +104,7 @@ void EngGrDictionary::translateGrToEng()
 	std::wcout << L"\n Greek -> English"
 		<< std::endl;
 	std::wstring inWord = getUserInput();
-	std::wcout << L"inputted: " << inWord << L'\n';
 	boost::algorithm::to_lower( inWord );
-	std::wcout << L"inputted: " << inWord << L'\n';
 	if ( m_greekWords.find( inWord ) != m_greekWords.end() )
 	{
 		std::wcout << m_greekWords[inWord].second
@@ -168,9 +152,7 @@ void EngGrDictionary::findEnglishWord()
 void EngGrDictionary::findGreekWord()
 {
 	std::wstring inWord = getUserInput();
-	std::wcout << L"inputted: " << inWord << L'\n';
 	boost::algorithm::to_lower( inWord );
-	std::wcout << L"inputted: " << inWord << L'\n';
 	if ( m_greekWords.find( inWord ) != m_greekWords.end() )
 	{
 		std::wcout << m_greekWords[inWord].first
@@ -369,13 +351,5 @@ void EngGrDictionary::aboutMenu()
 	std::wcout << L"\nEnglish - Greek dictionary v0.1\n\n";
 	std::wcout << L"A Digital dictionary able to translate words between English <->\
 Greek, as well as providing their respective meanings.\n";
-
-	if ( backToMainMenu() )
-	{
-		return;
-	}
-	else
-	{
-		aboutMenu();
-	}
+	return;
 }
