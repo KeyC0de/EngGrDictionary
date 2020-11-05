@@ -71,6 +71,8 @@ public:
 	//			loads dictionary from file if this is the first time we call it
 	//	\date	2018/11/04 23:51
 	static EngGrDictionary& getInstance();
+
+	
 	void addEnglishWord( std::wstring engWord,
 		std::wstring meaning,
 		std::wstring grWord );

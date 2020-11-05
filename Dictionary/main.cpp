@@ -15,12 +15,12 @@ int main()
 	_setmode( _fileno( stdin ), _O_U16TEXT );
 	std::ios_base::sync_with_stdio( false );
 	// use w-streams for interaction with the console & regular streams for interaction with files
-	const char* zsEnglishLocaleName = "en-US.UTF-8";
-	const wchar_t* zwsEnglishLocaleName = L"en-US.UTF-8";
-	std::setlocale( LC_ALL, zsEnglishLocaleName );
-	std::locale englishLocale{ zsEnglishLocaleName };
-	std::locale::global( englishLocale );
-	_wsetlocale( LC_ALL, zwsEnglishLocaleName );
+	//const char* zsEnglishLocaleName = "en-US.UTF-8";
+	//const wchar_t* zwsEnglishLocaleName = L"en-US.UTF-8";
+	//std::setlocale( LC_ALL, zsEnglishLocaleName );
+	//std::locale englishLocale{ zsEnglishLocaleName };
+	//std::locale::global( englishLocale );
+	//_wsetlocale( LC_ALL, zwsEnglishLocaleName );
 
 
 	// few entries for demo

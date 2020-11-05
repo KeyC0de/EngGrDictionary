@@ -18,6 +18,7 @@ EngGrDictionary& EngGrDictionary::getInstance()
 	static EngGrDictionary instance;
 	if ( !bInstanceCreated )
 	{
+		bInstanceCreated = true;
 		// create the file if it doesn't exist
 		std::wfstream file( fileName );
 		if ( file.is_open() )
@@ -50,7 +51,6 @@ EngGrDictionary& EngGrDictionary::getInstance()
 			file.close();
 			return instance;
 		}
-		bInstanceCreated = true;
 	}
 	return instance;
 }
@@ -173,6 +173,7 @@ void EngGrDictionary::findGreekWord()
 	}
 }
 
+
 void EngGrDictionary::addEnglishWord( std::wstring engWord,
 	std::wstring meaning,
 	std::wstring grWord )
@@ -180,9 +181,8 @@ void EngGrDictionary::addEnglishWord( std::wstring engWord,
 	boost::algorithm::to_lower( engWord );
 	if ( m_englishWords.find( engWord ) == m_englishWords.end() )
 	{
-		m_englishWords.insert( std::make_pair( engWord,
-			std::make_pair( meaning, grWord ) ) );
-		m_nEntries++;
+		m_englishWords.insert( { engWord, { meaning, grWord } } );
+		++m_nEntries;
 	}
 	else
 	{
@@ -197,9 +197,8 @@ void EngGrDictionary::addGreekWord( std::wstring grWord,
 	boost::algorithm::to_lower( grWord );
 	if ( m_greekWords.find( grWord ) == m_greekWords.end() )
 	{
-		m_greekWords.insert( std::make_pair( grWord,
-			std::pair<std::wstring, std::wstring>( meaning, engWord ) ) );
-		m_nEntries++;
+		m_greekWords.insert( { grWord, { meaning, engWord } } );
+		++m_nEntries;
 	}
 	else
 	{
