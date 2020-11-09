@@ -4,9 +4,6 @@
 #include "digital_dictionary.hpp"
 #include <iostream>
 
-#define inst EngGrDictionary::getInstance()
-
-
 int main() 
 {
 	fflush( stdout );
@@ -22,6 +19,7 @@ int main()
 	//std::locale::global( englishLocale );
 	//_wsetlocale( LC_ALL, zwsEnglishLocaleName );
 
+	EngGrDictionary& inst = EngGrDictionary::getInstance();
 
 	// few entries for demo
 	inst.addEnglishWord( L"a la carte",
