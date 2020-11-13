@@ -149,6 +149,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="digital_dictionary.hpp" />
+    <ClInclude Include="winner.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

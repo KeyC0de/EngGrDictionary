@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="winner.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
     <ClInclude Include="digital_dictionary.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
