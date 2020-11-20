@@ -6,8 +6,13 @@
 #include "digital_dictionary.hpp"
 
 
-#pragma region WINCONSOLE
-#if defined _WIN32 || defined _MSC_VER
+#if defined _MSC_VER
+#	pragma region WIN_UNICODE_SUPPORT
+#endif
+#if defined _WIN32
+#	include <windows.h>
+#	include <io.h>
+#	include <fcntl.h>
 static DWORD getFontFamily( HANDLE h )
 {
 	CONSOLE_FONT_INFO cfi;
@@ -43,13 +48,19 @@ void getConsoleInfo( HANDLE h )
 		<< L'\n';
 }
 #endif
-#pragma endregion
+#if defined _MSC_VER
+#	pragma endregion
+#endif
 
-int main() 
+
+int main()
 {
 	fflush( stdout );
-#if defined _WIN32 || defined _MSC_VER
-	// change code page to UNICODE
+#if defined _MSC_VER
+#	pragma region WIN_UNICODE_SUPPORT_MAIN
+#endif
+#if defined _WIN32
+	// change code page to UTF-8 UNICODE
 	if ( !IsValidCodePage( CP_UTF8 ) )
 	{
 		return GetLastError();
@@ -78,15 +89,18 @@ int main()
 
 	getConsoleInfo( hStdOut );
 	
-	// change file translation mode
+	// change file stream translation mode
 	_setmode( _fileno( stdout ), _O_U16TEXT );
 	_setmode( _fileno( stderr ), _O_U16TEXT );
 	_setmode( _fileno( stdin ), _O_U16TEXT );
 	// use w-streams for interaction with the console
 	// use regular streams for interaction with files
 #endif
+#if defined _MSC_VER
+#	pragma endregion
+#endif
 	std::ios_base::sync_with_stdio( false );
-
+	// program:...
 
 	EngGrDictionary& inst = EngGrDictionary::getInstance();
 
@@ -163,4 +177,3 @@ transfer of sperm during copulation.",
 	inst.mainMenu();
 	return 0;
 }
-
