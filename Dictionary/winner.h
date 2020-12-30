@@ -1,11 +1,10 @@
 #pragma once
 
-#include <sdkddkver.h>	// applies default values to windows defines, 
-						//	unless some are already defined (eg _WIN32_WINNT)
 #undef _WIN32_WINNT
 #undef NTDDI_VERSION
 #define _WIN32_WINNT _WIN32_WINNT_WINBLUE
 #define NTDDI_VERSION NTDDI_WINBLUE
+#include <sdkddkver.h>
 
 #ifndef _MSC_VER
 static_assert( false, "Non Windows Platform - Nah huh\n" );
@@ -44,7 +43,8 @@ static_assert( false, "Non Windows Platform - Nah huh\n" );
 #	define NOSERVICE				// All SERVICE_ Controller routines
 //#	define NOSOUND					// Sound driver routines
 #	define NOIMAGE					// 
-#	define NOTEXTMETRIC				// typedef TEXTMETRIC and associated routines
+//#	define NOTEXTMETRIC				// typedef TEXTMETRIC and associated routines
+									// required by atlbase.h
 #	define NOWH						// SetWindowsHook and WH_*
 #	define NOWINOFFSETS				// GWL_*, GCL_*, associated routines
 #	define NOCOMM					// No serial communication API & driver routines
@@ -73,7 +73,7 @@ static_assert( false, "Non Windows Platform - Nah huh\n" );
 
 #define _CRT_SECURE_NO_DEPRECATE	// non-secure c/winapi functions are not deprecated
 #define _SCL_SECURE_NO_WARNINGS		// don't emit warnings for non-secure winapi functions
-#define _ITERATOR_DEBUG_LEVEL	0	// disable checked iterators === #define _SECURE_SCL 0
+//#define _ITERATOR_DEBUG_LEVEL	0	// disable checked iterators === #define _SECURE_SCL 0
 #define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING
 #define _CRT_SECURE_NO_WARNINGS 1
 #define _WINSOCK_DEPRECATED_NO_WARNINGS 1
@@ -116,7 +116,6 @@ static_assert( false, "Non Windows Platform - Nah huh\n" );
 #		define __function__ __func__
 #	endif
 #endif
-
 
 // provides relocatable base address at RVA = 0
 extern "C" IMAGE_DOS_HEADER __ImageBase;
