@@ -3,7 +3,7 @@
 #include <algorithm>
 #include <iomanip>
 #include <codecvt>
-#include "digital_dictionary.hpp"
+#include "digital_dictionary.h"
 
 
 EngGrDictionary::EngGrDictionary()

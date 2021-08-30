@@ -2,15 +2,14 @@
 #include <io.h>
 #include <fcntl.h>
 #include <iostream>
-#include "winner.h"
-#include "digital_dictionary.hpp"
+#include "digital_dictionary.h"
 
 
 #if defined _MSC_VER
 #	pragma region WIN_UNICODE_SUPPORT
 #endif
 #if defined _WIN32
-#	include <windows.h>
+#	include "winner.h"
 #	include <io.h>
 #	include <fcntl.h>
 static DWORD getFontFamily( HANDLE h )
@@ -27,19 +26,20 @@ static DWORD getFontFamily( HANDLE h )
 		<< L','
 		<< cfi.dwFontSize.Y
 		<< L")\n";
-	return conFont ? cfi.nFont
-		: -1;
+	return conFont ?
+		cfi.nFont :
+		-1;
 }
 
 void getConsoleInfo( HANDLE h )
 {
 	using GETNUMBEROFCONSOLEFONTS = DWORD (WINAPI* )();
-    using SETCONSOLEFONT = BOOL (WINAPI*)( HANDLE hConOut, DWORD nFont );
+	using SETCONSOLEFONT = BOOL (WINAPI*)( HANDLE hConOut, DWORD nFont );
 	auto GetNumberOfConsoleFonts =
 		(GETNUMBEROFCONSOLEFONTS) GetProcAddress( LoadLibraryW( L"KERNEL32" ),
 		"GetNumberOfConsoleFonts" );
-    auto SetConsoleFont = (SETCONSOLEFONT) GetProcAddress(LoadLibraryW(L"KERNEL32"),
-		"SetConsoleFont");
+	auto SetConsoleFont = (SETCONSOLEFONT) GetProcAddress( LoadLibraryW( L"KERNEL32" ),
+		"SetConsoleFont" );
 	auto font = getFontFamily( h );
 	std::wcout << L"nConsoleFonts="
 		<< GetNumberOfConsoleFonts()
@@ -93,8 +93,6 @@ int main()
 	_setmode( _fileno( stdout ), _O_U16TEXT );
 	_setmode( _fileno( stderr ), _O_U16TEXT );
 	_setmode( _fileno( stdin ), _O_U16TEXT );
-	// use w-streams for interaction with the console
-	// use regular streams for interaction with files
 #endif
 #if defined _MSC_VER
 #	pragma endregion
