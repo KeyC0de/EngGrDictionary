@@ -173,5 +173,7 @@ transfer of sperm during copulation.",
 		L"Τίτλος αποδιδόμενος σε άγγλους ευγενείς (κατά κύριολόγο) κατά την Αναγέννηση",
 		L"lord" );
 	inst.mainMenu();
-	return 0;
+	
+	__debugbreak();
+	return EXIT_SUCCESS;
 }
