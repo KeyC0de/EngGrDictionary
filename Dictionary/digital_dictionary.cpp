@@ -11,7 +11,9 @@ EngGrDictionary::EngGrDictionary()
 	m_nEnglishWords{0u},
 	m_nGreekWords{0u},
 	m_nEntries{0u}
-{}
+{
+
+}
 
 EngGrDictionary& EngGrDictionary::getInstance()
 {
@@ -34,13 +36,13 @@ EngGrDictionary& EngGrDictionary::getInstance()
 			//{
 			//	file.imbue( std::locale( file.getloc(),
 			//		new std::codecvt_utf16<wchar_t>) );
-			//	std::wcout << L"ucs-2 or utf-16" << L'\n';
+			//	std::wcout << L"ucs-2 or utf-16\n";
 			//}
 			//else
 			//{ // (c1 == L'0xEF' && c2 == L'0xBB' && c3 == L'0xBF')	// UTF-8
 			//	file.imbue( std::locale( file.getloc(),
 			//		new std::codecvt_utf8<wchar_t>) );
-			//	std::wcout << L"utf-8" << L'\n';
+			//	std::wcout << L"utf-8\n";
 			//}
 			file.seekg( std::ios::beg );
 	
@@ -272,18 +274,18 @@ void EngGrDictionary::mainMenu()
 		std::wcout << std::setw( 14 )
 			<< std::boolalpha
 			<< L'\n';
-		std::wcout << L"DICTIONARY" << L'\n';
-		std::wcout << L"====================================" << L'\n';
-		std::wcout << L"\n\nChoose Menu (0-5):" << L'\n';
-		std::wcout << L"English -> Greek (1)" << L'\n';
-		std::wcout << L"Greek -> English (2)" << L'\n';
-		std::wcout << L"Lookup english word (3)" << L'\n';
-		std::wcout << L"Lookup greek word (4)" << L'\n';
-		std::wcout << L"Add english word (5)" << L'\n';
-		std::wcout << L"Add greek word (6)" << L'\n';
-		std::wcout << L"Display english words (7)" << L'\n';
-		std::wcout << L"Display greek words (8)" << L'\n';
-		std::wcout << L"About (9)" << L'\n';
+		std::wcout << L"DICTIONARY\n";
+		std::wcout << L"====================================\n";
+		std::wcout << L"\n\nChoose Menu (0-5):\n";
+		std::wcout << L"English -> Greek (1)\n";
+		std::wcout << L"Greek -> English (2)\n";
+		std::wcout << L"Lookup english word (3)\n";
+		std::wcout << L"Lookup greek word (4)\n";
+		std::wcout << L"Add english word (5)\n";
+		std::wcout << L"Add greek word (6)\n";
+		std::wcout << L"Display english words (7)\n";
+		std::wcout << L"Display greek words (8)\n";
+		std::wcout << L"About (9)\n";
 		std::wcout << L"Exit (0)" << std::endl;
 		std::wcin >> option;
 		std::wcin.ignore();	// ignore next char (ie. the L'\n')

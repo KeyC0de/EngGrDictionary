@@ -174,6 +174,8 @@ transfer of sperm during copulation.",
 		L"lord" );
 	inst.mainMenu();
 	
-	__debugbreak();
+#if defined _DEBUG && !defined NDEBUG
+	while ( !getchar() );
+#endif
 	return EXIT_SUCCESS;
 }
